@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+
+BARCODE_LIST = File.expand_path('~/Code/hiseq-16s-pipeline/data/triplett-barcodes.csv')
+LABEL = 'test'
+
+# label by barcode
+# send to HPC
+# cluster (map)
+# collect results (reduce)
+
+directory = ARGV[0]
+
+files = Dir.glob(File.join(directory, '*.txt'))
+
+puts "Found #{files.size} files."
+
+groups = files.group_by do |path|
+  d = File.basename(path).split('_')
+  { :lane => d[1], :chunk => d[3] }
+end
+
+groups.each_pair do |k, files|
+  left, bc, right = files.sort
+
+  puts "barcodes=#{bc}"
+
+  cmd = ['hp-label-by-barcode',
+	 "--left-reads #{left}",
+         "--barcode-reads #{bc}",
+         "--right-reads #{right}",
+         "--barcodes #{BARCODE_LIST}",
+         ">> #{LABEL}-lane_#{k[:lane]}.fastq"
+	 ]
+
+  system cmd.join(' ')
+  exit
+end

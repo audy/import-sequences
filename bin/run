@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 BARCODE_LIST = File.expand_path('~/Code/hiseq-16s-pipeline/data/triplett-barcodes.csv')
-LABEL = 'test'
+ILLUMINA_RUN = 'illumina4'
 
 # label by barcode
 # send to HPC
@@ -12,26 +12,31 @@ directory = ARGV[0]
 
 files = Dir.glob(File.join(directory, '*.txt'))
 
-puts "Found #{files.size} files."
-
 groups = files.group_by do |path|
   d = File.basename(path).split('_')
   { :lane => d[1], :chunk => d[3] }
 end
 
+puts "Found #{files.size} files in #{groups.size} Chunks"
+
 groups.each_pair do |k, files|
+  puts "group: #{k.inspect}"
+
   left, bc, right = files.sort
 
   puts "barcodes=#{bc}"
 
   cmd = ['hp-label-by-barcode',
-	 "--left-reads #{left}",
+         "--left-reads #{left}",
          "--barcode-reads #{bc}",
          "--right-reads #{right}",
          "--barcodes #{BARCODE_LIST}",
-         ">> #{LABEL}-lane_#{k[:lane]}.fastq"
-	 ]
-
-  system cmd.join(' ')
-  exit
+         "--read-format qseq",
+         "--reverse-barcode",
+         "--complement-barcode",
+         "--id-format 'e=#{ILLUMINA_RUN}:b=%(barcode)s:l=#{k[:lane]}'",
+         ">> #{ILLUMINA_RUN}.fastq"
+   ]
+  cmd = cmd.join(' ')
+  system cmd
 end

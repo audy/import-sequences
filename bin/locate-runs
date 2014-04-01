@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+BASEDIR = ARGV[0] || '/media'
+
+runs = Dir.glob(File.join(BASEDIR, '*', '*', 'Data', 'Intensities', 'BaseCalls'))
+
+$stderr.puts "I found #{runs.size} runs"
+
+runs.each do |run|
+  puts "#{run}"
+end

@@ -2,7 +2,7 @@
 
 BASEDIR = ARGV[0] || '/media'
 
-runs = Dir.glob(File.join(BASEDIR, '*', '*', 'Data', 'Intensities', 'BaseCalls'))
+runs = Dir.glob(File.join(BASEDIR, '*', '*', 'Data', 'Intensities', 'BaseCalls'), File::FNM_CASEFOLD)
 
 $stderr.puts "I found #{runs.size} runs"
 

@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+fail 'require exactly 3 arguments' unless ARGV.size == 2
+
+$stderr.print '.'
+
+system "qseq-to-fastq --left #{ARGV[0]} --right #{ARGV[1]}"

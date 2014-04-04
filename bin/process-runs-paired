@@ -1,0 +1,5 @@
+#!/bin/bash
+
+bin/locate-runs \
+  | xargs bin/locate-qseq-files \
+  | xargs -n3 bin/convert-to-fastq
